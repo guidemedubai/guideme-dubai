@@ -14,20 +14,26 @@ import {
   Headphones,
 } from "lucide-react";
 
-async function getFeaturedProperties() {
-  const properties = await prisma.property.findMany({
-    where: { featured: true },
-    include: {
-      rooms: { select: { price: true }, orderBy: { price: "asc" }, take: 1 },
-    },
-    take: 4,
-  });
+export const dynamic = "force-dynamic";
 
-  return properties.map((p) => ({
-    ...p,
-    images: JSON.parse(p.images) as string[],
-    minPrice: p.rooms[0]?.price || null,
-  }));
+async function getFeaturedProperties() {
+  try {
+    const properties = await prisma.property.findMany({
+      where: { featured: true },
+      include: {
+        rooms: { select: { price: true }, orderBy: { price: "asc" }, take: 1 },
+      },
+      take: 4,
+    });
+
+    return properties.map((p) => ({
+      ...p,
+      images: JSON.parse(p.images) as string[],
+      minPrice: p.rooms[0]?.price || null,
+    }));
+  } catch {
+    return [];
+  }
 }
 
 export default async function HomePage() {
