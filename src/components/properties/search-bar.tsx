@@ -137,7 +137,7 @@ export function SearchBar({
           "w-full",
           isCompact
             ? "flex flex-wrap items-end gap-2"
-            : "bg-background rounded-xl shadow-lg p-4 md:p-6",
+            : "bg-background text-foreground rounded-xl shadow-lg p-4 md:p-6",
           className
         )}
       >
