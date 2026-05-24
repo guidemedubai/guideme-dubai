@@ -58,71 +58,6 @@ interface SearchBarProps {
   onSearch?: (values: SearchFormValues) => void;
 }
 
-function DatePickerField({
-  value,
-  onChange,
-  disabled,
-  placeholder,
-  isMobile,
-}: {
-  value: Date | undefined;
-  onChange: (date: Date | undefined) => void;
-  disabled: (date: Date) => boolean;
-  placeholder: string;
-  isMobile: boolean;
-}) {
-  const [open, setOpen] = React.useState(false);
-
-  const trigger = (
-    <Button
-      type="button"
-      variant="outline"
-      className={cn(
-        "w-full justify-start text-left font-normal h-10",
-        !value && "text-muted-foreground"
-      )}
-      onClick={() => setOpen(true)}
-    >
-      <CalendarIcon className="mr-2 h-4 w-4" />
-      {value ? format(value, "MMM dd, yyyy") : <span>{placeholder}</span>}
-    </Button>
-  );
-
-  const calendar = (
-    <Calendar
-      mode="single"
-      selected={value}
-      onSelect={(date) => {
-        onChange(date);
-        setOpen(false);
-      }}
-      disabled={disabled}
-    />
-  );
-
-  if (isMobile) {
-    return (
-      <div>
-        {trigger}
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogContent className="p-0 w-auto max-w-[calc(100vw-2rem)]" showCloseButton={false}>
-            {calendar}
-          </DialogContent>
-        </Dialog>
-      </div>
-    );
-  }
-
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>{trigger}</PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
-        {calendar}
-      </PopoverContent>
-    </Popover>
-  );
-}
-
 export function SearchBar({
   defaultValues,
   variant = "default",
@@ -142,6 +77,12 @@ export function SearchBar({
     },
   });
 
+  const checkInValue = form.watch("checkIn");
+  const checkOutValue = form.watch("checkOut");
+
+  const [checkInOpen, setCheckInOpen] = React.useState(false);
+  const [checkOutOpen, setCheckOutOpen] = React.useState(false);
+
   const handleSubmit = (values: SearchFormValues) => {
     if (onSearch) {
       onSearch(values);
@@ -157,6 +98,36 @@ export function SearchBar({
   };
 
   const isCompact = variant === "compact";
+
+  const checkInButton = (
+    <Button
+      type="button"
+      variant="outline"
+      className={cn(
+        "w-full justify-start text-left font-normal h-10",
+        !checkInValue && "text-muted-foreground"
+      )}
+      onClick={() => setCheckInOpen(true)}
+    >
+      <CalendarIcon className="mr-2 h-4 w-4" />
+      {checkInValue ? format(checkInValue, "MMM dd, yyyy") : "Check-in"}
+    </Button>
+  );
+
+  const checkOutButton = (
+    <Button
+      type="button"
+      variant="outline"
+      className={cn(
+        "w-full justify-start text-left font-normal h-10",
+        !checkOutValue && "text-muted-foreground"
+      )}
+      onClick={() => setCheckOutOpen(true)}
+    >
+      <CalendarIcon className="mr-2 h-4 w-4" />
+      {checkOutValue ? format(checkOutValue, "MMM dd, yyyy") : "Check-out"}
+    </Button>
+  );
 
   return (
     <Form {...form}>
@@ -203,18 +174,48 @@ export function SearchBar({
           <FormField
             control={form.control}
             name="checkIn"
-            render={({ field }) => (
+            render={() => (
               <FormItem className={cn(isCompact ? "flex-1 min-w-[140px]" : "")}>
                 {!isCompact && <FormLabel>Check-in</FormLabel>}
-                <DatePickerField
-                  value={field.value}
-                  onChange={field.onChange}
-                  placeholder="Check-in"
-                  isMobile={isMobile}
-                  disabled={(date) =>
-                    date < new Date(new Date().setHours(0, 0, 0, 0))
-                  }
-                />
+                {isMobile ? (
+                  <>
+                    {checkInButton}
+                    <Dialog open={checkInOpen} onOpenChange={setCheckInOpen}>
+                      <DialogContent className="p-0 w-auto max-w-[calc(100vw-2rem)]" showCloseButton={false}>
+                        <Calendar
+                          mode="single"
+                          selected={checkInValue}
+                          onSelect={(date) => {
+                            form.setValue("checkIn", date as Date, { shouldValidate: true });
+                            setCheckInOpen(false);
+                          }}
+                          disabled={(date) =>
+                            date < new Date(new Date().setHours(0, 0, 0, 0))
+                          }
+                        />
+                      </DialogContent>
+                    </Dialog>
+                  </>
+                ) : (
+                  <Popover open={checkInOpen} onOpenChange={setCheckInOpen}>
+                    <PopoverTrigger asChild>
+                      {checkInButton}
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={checkInValue}
+                        onSelect={(date) => {
+                          form.setValue("checkIn", date as Date, { shouldValidate: true });
+                          setCheckInOpen(false);
+                        }}
+                        disabled={(date) =>
+                          date < new Date(new Date().setHours(0, 0, 0, 0))
+                        }
+                      />
+                    </PopoverContent>
+                  </Popover>
+                )}
                 <FormMessage />
               </FormItem>
             )}
@@ -224,22 +225,56 @@ export function SearchBar({
           <FormField
             control={form.control}
             name="checkOut"
-            render={({ field }) => (
+            render={() => (
               <FormItem className={cn(isCompact ? "flex-1 min-w-[140px]" : "")}>
                 {!isCompact && <FormLabel>Check-out</FormLabel>}
-                <DatePickerField
-                  value={field.value}
-                  onChange={field.onChange}
-                  placeholder="Check-out"
-                  isMobile={isMobile}
-                  disabled={(date) => {
-                    const checkIn = form.getValues("checkIn");
-                    return (
-                      date < new Date(new Date().setHours(0, 0, 0, 0)) ||
-                      (checkIn && date <= checkIn)
-                    );
-                  }}
-                />
+                {isMobile ? (
+                  <>
+                    {checkOutButton}
+                    <Dialog open={checkOutOpen} onOpenChange={setCheckOutOpen}>
+                      <DialogContent className="p-0 w-auto max-w-[calc(100vw-2rem)]" showCloseButton={false}>
+                        <Calendar
+                          mode="single"
+                          selected={checkOutValue}
+                          onSelect={(date) => {
+                            form.setValue("checkOut", date as Date, { shouldValidate: true });
+                            setCheckOutOpen(false);
+                          }}
+                          disabled={(date) => {
+                            const ci = form.getValues("checkIn");
+                            return (
+                              date < new Date(new Date().setHours(0, 0, 0, 0)) ||
+                              (ci && date <= ci)
+                            );
+                          }}
+                        />
+                      </DialogContent>
+                    </Dialog>
+                  </>
+                ) : (
+                  <Popover open={checkOutOpen} onOpenChange={setCheckOutOpen}>
+                    <PopoverTrigger asChild>
+                      {checkOutButton}
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={checkOutValue}
+                        onSelect={(date) => {
+                          form.setValue("checkOut", date as Date, { shouldValidate: true });
+                          setCheckOutOpen(false);
+                        }}
+                        disabled={(date) => {
+                          const ci = form.getValues("checkIn");
+                          return (
+                            date < new Date(new Date().setHours(0, 0, 0, 0)) ||
+                            (ci && date <= ci)
+                          );
+                        }}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                )}
                 <FormMessage />
               </FormItem>
             )}
