@@ -98,7 +98,7 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative min-h-[650px] flex items-center justify-center">
+      <section className="relative min-h-[500px] md:min-h-[650px] flex items-center justify-center py-12 md:py-0">
         <div className="absolute inset-0 z-0">
           <Image
             src="https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=1920"
@@ -179,14 +179,14 @@ export default async function HomePage() {
       {/* Featured Properties */}
       <section className="py-16 bg-muted/30">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div>
-              <h2 className="text-3xl font-bold mb-2">Where to Stay</h2>
-              <p className="text-muted-foreground">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-2">Where to Stay</h2>
+              <p className="text-muted-foreground text-sm sm:text-base">
                 Hand-picked guesthouses and resorts across the Maldives
               </p>
             </div>
-            <Button asChild variant="outline">
+            <Button asChild variant="outline" className="self-start sm:self-auto shrink-0">
               <Link href="/properties">View All</Link>
             </Button>
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -56,6 +56,12 @@ export function PropertyFilters({
 }: PropertyFiltersProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
+  useEffect(() => {
+    if (window.innerWidth < 768) {
+      setIsExpanded(false);
+    }
+  }, []);
+
   const handleCityChange = (value: string) => {
     onFiltersChange({ ...filters, city: value === "all" ? "" : value });
   };
@@ -98,7 +104,7 @@ export function PropertyFilters({
             variant="ghost"
             size="sm"
             onClick={() => setIsExpanded(!isExpanded)}
-            className="md:hidden"
+            className="lg:hidden"
           >
             {isExpanded ? "Hide" : "Show"}
           </Button>

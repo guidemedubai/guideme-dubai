@@ -201,14 +201,14 @@ export default function ExplorePage() {
               return (
                 <Link key={category.name} href={category.href}>
                   <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer h-full">
-                    <CardContent className="p-6 flex flex-col items-center text-center">
-                      <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-4 ${category.color}`}>
-                        <Icon className="h-7 w-7" />
+                    <CardContent className="p-4 sm:p-6 flex flex-col items-center text-center">
+                      <div className={`w-11 h-11 sm:w-14 sm:h-14 rounded-full flex items-center justify-center mb-3 sm:mb-4 ${category.color}`}>
+                        <Icon className="h-5 w-5 sm:h-7 sm:w-7" />
                       </div>
-                      <h3 className="font-semibold text-lg mb-1 group-hover:text-primary transition-colors">
+                      <h3 className="font-semibold text-sm sm:text-lg mb-1 group-hover:text-primary transition-colors">
                         {category.name}
                       </h3>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-xs sm:text-sm text-muted-foreground">
                         {category.count} listings
                       </p>
                     </CardContent>
@@ -223,14 +223,14 @@ export default function ExplorePage() {
       {/* Featured Properties */}
       <section className="py-16 bg-muted/50">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div>
-              <h2 className="text-3xl font-bold mb-2">Featured Properties</h2>
-              <p className="text-muted-foreground">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-2">Featured Properties</h2>
+              <p className="text-muted-foreground text-sm sm:text-base">
                 Hand-picked hotels for an exceptional stay
               </p>
             </div>
-            <Button asChild variant="outline">
+            <Button asChild variant="outline" className="self-start sm:self-auto shrink-0">
               <Link href="/properties">
                 View All
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -302,14 +302,14 @@ export default function ExplorePage() {
       {/* Featured Activities */}
       <section className="py-16 bg-background">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div>
-              <h2 className="text-3xl font-bold mb-2">Featured Activities</h2>
-              <p className="text-muted-foreground">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-2">Featured Activities</h2>
+              <p className="text-muted-foreground text-sm sm:text-base">
                 Unforgettable experiences across the Maldives
               </p>
             </div>
-            <Button asChild variant="outline">
+            <Button asChild variant="outline" className="self-start sm:self-auto shrink-0">
               <Link href="/search?category=activities">
                 View All
                 <ArrowRight className="ml-2 h-4 w-4" />

@@ -7,7 +7,7 @@ import { addDays, differenceInDays, format } from "date-fns";
 import type { DateRange } from "react-day-picker";
 import { toast } from "sonner";
 
-import { cn } from "@/lib/utils";
+import { cn, useIsMobile } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -20,7 +20,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -107,6 +106,8 @@ function ItineraryPlannerContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get("edit");
+
+  const isMobile = useIsMobile();
 
   // Trip details
   const [tripName, setTripName] = useState("");
@@ -472,75 +473,151 @@ function ItineraryPlannerContent() {
             {/* Start Date */}
             <div className="space-y-2">
               <Label>Start Date</Label>
-              <Popover open={startPopoverOpen} onOpenChange={setStartPopoverOpen}>
-                <PopoverTrigger asChild>
+              {isMobile ? (
+                <>
                   <Button
+                    type="button"
                     variant="outline"
                     className={cn(
                       "w-full justify-start text-left font-normal",
                       !dateRange?.from && "text-muted-foreground"
                     )}
+                    onClick={() => setStartPopoverOpen(true)}
                   >
                     <CalendarDays className="mr-2 h-4 w-4" />
                     {dateRange?.from
                       ? format(dateRange.from, "MMM dd, yyyy")
                       : "Pick a date"}
                   </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={dateRange?.from}
-                    onSelect={(date) => {
-                      setDateRange((prev) => ({
-                        from: date,
-                        to: prev?.to && date && prev.to > date ? prev.to : undefined,
-                      }));
-                      setStartPopoverOpen(false);
-                    }}
-                    disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                  />
-                </PopoverContent>
-              </Popover>
+                  <Dialog open={startPopoverOpen} onOpenChange={setStartPopoverOpen}>
+                    <DialogContent className="p-0 w-auto max-w-[calc(100vw-2rem)]" showCloseButton={false}>
+                      <Calendar
+                        mode="single"
+                        selected={dateRange?.from}
+                        onSelect={(date) => {
+                          setDateRange((prev) => ({
+                            from: date,
+                            to: prev?.to && date && prev.to > date ? prev.to : undefined,
+                          }));
+                          setStartPopoverOpen(false);
+                        }}
+                        disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                      />
+                    </DialogContent>
+                  </Dialog>
+                </>
+              ) : (
+                <Popover open={startPopoverOpen} onOpenChange={setStartPopoverOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !dateRange?.from && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarDays className="mr-2 h-4 w-4" />
+                      {dateRange?.from
+                        ? format(dateRange.from, "MMM dd, yyyy")
+                        : "Pick a date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={dateRange?.from}
+                      onSelect={(date) => {
+                        setDateRange((prev) => ({
+                          from: date,
+                          to: prev?.to && date && prev.to > date ? prev.to : undefined,
+                        }));
+                        setStartPopoverOpen(false);
+                      }}
+                      disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                    />
+                  </PopoverContent>
+                </Popover>
+              )}
             </div>
 
             {/* End Date */}
             <div className="space-y-2">
               <Label>End Date</Label>
-              <Popover open={endPopoverOpen} onOpenChange={setEndPopoverOpen}>
-                <PopoverTrigger asChild>
+              {isMobile ? (
+                <>
                   <Button
+                    type="button"
                     variant="outline"
                     className={cn(
                       "w-full justify-start text-left font-normal",
                       !dateRange?.to && "text-muted-foreground"
                     )}
+                    onClick={() => setEndPopoverOpen(true)}
                   >
                     <CalendarDays className="mr-2 h-4 w-4" />
                     {dateRange?.to
                       ? format(dateRange.to, "MMM dd, yyyy")
                       : "Pick a date"}
                   </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    key={dateRange?.from?.toISOString()}
-                    mode="single"
-                    defaultMonth={dateRange?.from}
-                    selected={dateRange?.to}
-                    onSelect={(date) => {
-                      setDateRange((prev) => ({ from: prev?.from, to: date }));
-                      setEndPopoverOpen(false);
-                    }}
-                    disabled={(date) => {
-                      const today = new Date(new Date().setHours(0, 0, 0, 0));
-                      if (date < today) return true;
-                      if (dateRange?.from && date <= dateRange.from) return true;
-                      return false;
-                    }}
-                  />
-                </PopoverContent>
-              </Popover>
+                  <Dialog open={endPopoverOpen} onOpenChange={setEndPopoverOpen}>
+                    <DialogContent className="p-0 w-auto max-w-[calc(100vw-2rem)]" showCloseButton={false}>
+                      <Calendar
+                        key={dateRange?.from?.toISOString()}
+                        mode="single"
+                        defaultMonth={dateRange?.from}
+                        selected={dateRange?.to}
+                        onSelect={(date) => {
+                          setDateRange((prev) => ({ from: prev?.from, to: date }));
+                          setEndPopoverOpen(false);
+                        }}
+                        disabled={(date) => {
+                          const today = new Date(new Date().setHours(0, 0, 0, 0));
+                          if (date < today) return true;
+                          if (dateRange?.from && date <= dateRange.from) return true;
+                          return false;
+                        }}
+                      />
+                    </DialogContent>
+                  </Dialog>
+                </>
+              ) : (
+                <Popover open={endPopoverOpen} onOpenChange={setEndPopoverOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !dateRange?.to && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarDays className="mr-2 h-4 w-4" />
+                      {dateRange?.to
+                        ? format(dateRange.to, "MMM dd, yyyy")
+                        : "Pick a date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      key={dateRange?.from?.toISOString()}
+                      mode="single"
+                      defaultMonth={dateRange?.from}
+                      selected={dateRange?.to}
+                      onSelect={(date) => {
+                        setDateRange((prev) => ({ from: prev?.from, to: date }));
+                        setEndPopoverOpen(false);
+                      }}
+                      disabled={(date) => {
+                        const today = new Date(new Date().setHours(0, 0, 0, 0));
+                        if (date < today) return true;
+                        if (dateRange?.from && date <= dateRange.from) return true;
+                        return false;
+                      }}
+                    />
+                  </PopoverContent>
+                </Popover>
+              )}
             </div>
 
             {/* Budget */}

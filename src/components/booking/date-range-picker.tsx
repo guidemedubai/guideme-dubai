@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import type { DateRange } from "react-day-picker";
 
-import { cn } from "@/lib/utils";
+import { cn, useIsMobile } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -13,6 +13,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Dialog,
+  DialogContent,
+} from "@/components/ui/dialog";
 
 interface DateRangePickerProps {
   value?: DateRange;
@@ -38,6 +42,8 @@ export function DateRangePicker({
   maxDate,
 }: DateRangePickerProps) {
   const [open, setOpen] = React.useState(false);
+  const isMobile = useIsMobile();
+  const months = isMobile ? 1 : numberOfMonths;
 
   const defaultDisabled = React.useCallback(
     (date: Date) => {
@@ -61,6 +67,9 @@ export function DateRangePicker({
     }
 
     if (value.to) {
+      if (isMobile) {
+        return `${format(value.from, "MMM dd")} - ${format(value.to, "MMM dd")}`;
+      }
       return `${format(value.from, "MMM dd, yyyy")} - ${format(
         value.to,
         "MMM dd, yyyy"
@@ -72,37 +81,56 @@ export function DateRangePicker({
 
   const handleSelect = (range: DateRange | undefined) => {
     onChange?.(range);
-
-    // Close popover when both dates are selected
     if (range?.from && range?.to) {
       setOpen(false);
     }
   };
 
+  const trigger = (
+    <Button
+      type="button"
+      variant="outline"
+      className={cn(
+        "w-full justify-start text-left font-normal",
+        !value?.from && "text-muted-foreground",
+        className
+      )}
+      onClick={() => setOpen(true)}
+    >
+      <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
+      <span className="truncate">{formatDateRange()}</span>
+    </Button>
+  );
+
+  const calendar = (
+    <Calendar
+      mode="range"
+      defaultMonth={value?.from}
+      selected={value}
+      onSelect={handleSelect}
+      numberOfMonths={months}
+      disabled={defaultDisabled}
+    />
+  );
+
+  if (isMobile) {
+    return (
+      <>
+        {trigger}
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent className="p-0 w-auto max-w-[calc(100vw-2rem)]" showCloseButton={false}>
+            {calendar}
+          </DialogContent>
+        </Dialog>
+      </>
+    );
+  }
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          className={cn(
-            "w-full justify-start text-left font-normal",
-            !value?.from && "text-muted-foreground",
-            className
-          )}
-        >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {formatDateRange()}
-        </Button>
-      </PopoverTrigger>
+      <PopoverTrigger asChild>{trigger}</PopoverTrigger>
       <PopoverContent className="w-auto p-0" align={align}>
-        <Calendar
-          mode="range"
-          defaultMonth={value?.from}
-          selected={value}
-          onSelect={handleSelect}
-          numberOfMonths={numberOfMonths}
-          disabled={defaultDisabled}
-        />
+        {calendar}
       </PopoverContent>
     </Popover>
   );
@@ -125,6 +153,8 @@ export function DateRangePickerWithLabels({
   maxDate,
 }: DateRangePickerWithLabelsProps) {
   const [open, setOpen] = React.useState(false);
+  const isMobile = useIsMobile();
+  const months = isMobile ? 1 : numberOfMonths;
 
   const defaultDisabled = React.useCallback(
     (date: Date) => {
@@ -144,55 +174,74 @@ export function DateRangePickerWithLabels({
 
   const handleSelect = (range: DateRange | undefined) => {
     onChange?.(range);
-
-    // Close popover when both dates are selected
     if (range?.from && range?.to) {
       setOpen(false);
     }
   };
 
+  const trigger = (
+    <Button
+      type="button"
+      variant="outline"
+      className={cn(
+        "w-full justify-start text-left font-normal h-auto py-2",
+        className
+      )}
+      onClick={() => setOpen(true)}
+    >
+      <div className="flex items-center gap-3 sm:gap-4 w-full">
+        <CalendarIcon className="h-5 w-5 text-muted-foreground shrink-0" />
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 flex-1 min-w-0">
+          <div className="space-y-1 min-w-0">
+            <p className="text-xs text-muted-foreground">{checkInLabel}</p>
+            <p className={cn("text-sm truncate", !value?.from && "text-muted-foreground")}>
+              {value?.from
+                ? format(value.from, isMobile ? "MMM dd" : "MMM dd, yyyy")
+                : "Select date"}
+            </p>
+          </div>
+          <div className="space-y-1 border-l pl-3 sm:pl-4 min-w-0">
+            <p className="text-xs text-muted-foreground">{checkOutLabel}</p>
+            <p className={cn("text-sm truncate", !value?.to && "text-muted-foreground")}>
+              {value?.to
+                ? format(value.to, isMobile ? "MMM dd" : "MMM dd, yyyy")
+                : "Select date"}
+            </p>
+          </div>
+        </div>
+      </div>
+    </Button>
+  );
+
+  const calendar = (
+    <Calendar
+      mode="range"
+      defaultMonth={value?.from}
+      selected={value}
+      onSelect={handleSelect}
+      numberOfMonths={months}
+      disabled={defaultDisabled}
+    />
+  );
+
+  if (isMobile) {
+    return (
+      <>
+        {trigger}
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent className="p-0 w-auto max-w-[calc(100vw-2rem)]" showCloseButton={false}>
+            {calendar}
+          </DialogContent>
+        </Dialog>
+      </>
+    );
+  }
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          className={cn(
-            "w-full justify-start text-left font-normal h-auto py-2",
-            className
-          )}
-        >
-          <div className="flex items-center gap-4 w-full">
-            <CalendarIcon className="h-5 w-5 text-muted-foreground shrink-0" />
-            <div className="grid grid-cols-2 gap-4 flex-1">
-              <div className="space-y-1">
-                <p className="text-xs text-muted-foreground">{checkInLabel}</p>
-                <p className={cn("text-sm", !value?.from && "text-muted-foreground")}>
-                  {value?.from
-                    ? format(value.from, "MMM dd, yyyy")
-                    : "Select date"}
-                </p>
-              </div>
-              <div className="space-y-1 border-l pl-4">
-                <p className="text-xs text-muted-foreground">{checkOutLabel}</p>
-                <p className={cn("text-sm", !value?.to && "text-muted-foreground")}>
-                  {value?.to
-                    ? format(value.to, "MMM dd, yyyy")
-                    : "Select date"}
-                </p>
-              </div>
-            </div>
-          </div>
-        </Button>
-      </PopoverTrigger>
+      <PopoverTrigger asChild>{trigger}</PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
-        <Calendar
-          mode="range"
-          defaultMonth={value?.from}
-          selected={value}
-          onSelect={handleSelect}
-          numberOfMonths={numberOfMonths}
-          disabled={defaultDisabled}
-        />
+        {calendar}
       </PopoverContent>
     </Popover>
   );

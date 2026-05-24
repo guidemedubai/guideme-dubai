@@ -42,12 +42,12 @@ import {
 } from "@/components/ui/sheet";
 
 const navigation = [
-  { name: "Explore", href: "/explore" },
-  { name: "Properties", href: "/properties" },
-  { name: "Activities", href: "/activities" },
-  { name: "Itinerary", href: "/itinerary-planner" },
-  { name: "Map", href: "/map-explore" },
-  { name: "Budget Planner", href: "/budget-planner" },
+  { name: "Explore", href: "/explore", icon: Compass },
+  { name: "Properties", href: "/properties", icon: Hotel },
+  { name: "Activities", href: "/activities", icon: Calendar },
+  { name: "Itinerary", href: "/itinerary-planner", icon: LayoutDashboard },
+  { name: "Map", href: "/map-explore", icon: Map },
+  { name: "Budget Planner", href: "/budget-planner", icon: BarChart3 },
 ];
 
 export function Header() {
@@ -243,8 +243,8 @@ export function Header() {
               <span className="sr-only">Toggle menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-            <SheetHeader>
+          <SheetContent side="right" className="w-[300px] sm:w-[380px] flex flex-col p-0">
+            <SheetHeader className="p-4 pb-0">
               <SheetTitle>
                 <Link
                   href="/"
@@ -255,152 +255,167 @@ export function Header() {
                 </Link>
               </SheetTitle>
             </SheetHeader>
-            <nav className="flex flex-col gap-4 mt-8">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  onClick={() => setIsOpen(false)}
-                  className={cn(
-                    "text-lg font-medium transition-colors hover:text-primary py-2",
-                    pathname === item.href
-                      ? "text-primary"
-                      : "text-muted-foreground"
-                  )}
-                >
-                  {item.name}
-                </Link>
-              ))}
-              <div className="border-t pt-4 mt-4">
-                {isLoading ? (
-                  <div className="flex items-center gap-3 pb-4">
-                    <div className="h-10 w-10 rounded-full bg-muted animate-pulse" />
-                    <div className="space-y-2">
-                      <div className="h-4 w-24 bg-muted animate-pulse rounded" />
-                      <div className="h-3 w-32 bg-muted animate-pulse rounded" />
+            <nav className="flex flex-col flex-1 overflow-y-auto px-4 pb-4 mt-4">
+              <div className="space-y-1">
+                {navigation.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      onClick={() => setIsOpen(false)}
+                      className={cn(
+                        "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                        pathname === item.href
+                          ? "bg-primary/10 text-primary"
+                          : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                      )}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {item.name}
+                    </Link>
+                  );
+                })}
+              </div>
+
+              <div className="border-t my-4" />
+
+              {isLoading ? (
+                <div className="flex items-center gap-3 px-3 py-2">
+                  <div className="h-10 w-10 rounded-full bg-muted animate-pulse" />
+                  <div className="space-y-2">
+                    <div className="h-4 w-24 bg-muted animate-pulse rounded" />
+                    <div className="h-3 w-32 bg-muted animate-pulse rounded" />
+                  </div>
+                </div>
+              ) : user ? (
+                <div className="space-y-1">
+                  <div className="flex items-center gap-3 px-3 py-3 mb-2 rounded-lg bg-muted/50">
+                    <Avatar className="h-9 w-9">
+                      <AvatarImage src={user.image || undefined} alt={user.name || "User"} />
+                      <AvatarFallback className="text-xs">
+                        {getInitials(user.name, user.email)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">{user.name || "User"}</p>
+                      <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                     </div>
                   </div>
-                ) : user ? (
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3 pb-4 border-b">
-                      <Avatar>
-                        <AvatarImage src={user.image || undefined} alt={user.name || "User"} />
-                        <AvatarFallback>
-                          {getInitials(user.name, user.email)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="text-sm font-medium">{user.name || "User"}</p>
-                        <p className="text-xs text-muted-foreground">{user.email}</p>
-                      </div>
-                    </div>
-                    <Link
-                      href="/bookings"
-                      onClick={() => setIsOpen(false)}
-                      className="flex items-center gap-2 text-muted-foreground hover:text-primary py-2"
-                    >
-                      <Calendar className="h-4 w-4" />
-                      My Bookings
-                    </Link>
-                    <Link
-                      href="/favorites"
-                      onClick={() => setIsOpen(false)}
-                      className="flex items-center gap-2 text-muted-foreground hover:text-primary py-2"
-                    >
-                      <Heart className="h-4 w-4" />
-                      Favorites
-                    </Link>
-                    <Link
-                      href="/cart"
-                      onClick={() => setIsOpen(false)}
-                      className="flex items-center gap-2 text-muted-foreground hover:text-primary py-2"
-                    >
-                      <ShoppingCart className="h-4 w-4" />
-                      Cart
-                    </Link>
-                    <Link
-                      href="/itinerary-planner"
-                      onClick={() => setIsOpen(false)}
-                      className="flex items-center gap-2 text-muted-foreground hover:text-primary py-2"
-                    >
-                      <Compass className="h-4 w-4" />
-                      My Itineraries
-                    </Link>
-                    <Link
-                      href="/profile"
-                      onClick={() => setIsOpen(false)}
-                      className="flex items-center gap-2 text-muted-foreground hover:text-primary py-2"
-                    >
-                      <Settings className="h-4 w-4" />
-                      Profile
-                    </Link>
-                    {(user.role === "seller" || user.role === "owner") && (
-                      <>
-                        <Link
-                          href="/seller/dashboard"
-                          onClick={() => setIsOpen(false)}
-                          className="flex items-center gap-2 text-muted-foreground hover:text-primary py-2"
-                        >
-                          <Store className="h-4 w-4" />
-                          Seller Dashboard
-                        </Link>
-                        <Link
-                          href="/seller/analytics"
-                          onClick={() => setIsOpen(false)}
-                          className="flex items-center gap-2 text-muted-foreground hover:text-primary py-2"
-                        >
-                          <BarChart3 className="h-4 w-4" />
-                          Analytics
-                        </Link>
-                      </>
-                    )}
-                    {user.role === "agent" && (
+                  <Link
+                    href="/bookings"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+                  >
+                    <Calendar className="h-4 w-4" />
+                    My Bookings
+                  </Link>
+                  <Link
+                    href="/favorites"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+                  >
+                    <Heart className="h-4 w-4" />
+                    Favorites
+                  </Link>
+                  <Link
+                    href="/cart"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+                  >
+                    <ShoppingCart className="h-4 w-4" />
+                    Cart
+                  </Link>
+                  <Link
+                    href="/itinerary-planner"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+                  >
+                    <Compass className="h-4 w-4" />
+                    My Itineraries
+                  </Link>
+                  <Link
+                    href="/profile"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+                  >
+                    <Settings className="h-4 w-4" />
+                    Profile
+                  </Link>
+                  {(user.role === "seller" || user.role === "owner") && (
+                    <>
+                      <div className="border-t my-2" />
+                      <Link
+                        href="/seller/dashboard"
+                        onClick={() => setIsOpen(false)}
+                        className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+                      >
+                        <Store className="h-4 w-4" />
+                        Seller Dashboard
+                      </Link>
+                      <Link
+                        href="/seller/analytics"
+                        onClick={() => setIsOpen(false)}
+                        className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+                      >
+                        <BarChart3 className="h-4 w-4" />
+                        Analytics
+                      </Link>
+                    </>
+                  )}
+                  {user.role === "agent" && (
+                    <>
+                      <div className="border-t my-2" />
                       <Link
                         href="/agent/dashboard"
                         onClick={() => setIsOpen(false)}
-                        className="flex items-center gap-2 text-muted-foreground hover:text-primary py-2"
+                        className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
                       >
                         <Users className="h-4 w-4" />
                         Agent Dashboard
                       </Link>
-                    )}
-                    {user.role === "ADMIN" && (
+                    </>
+                  )}
+                  {user.role === "ADMIN" && (
+                    <>
+                      <div className="border-t my-2" />
                       <Link
                         href="/admin"
                         onClick={() => setIsOpen(false)}
-                        className="flex items-center gap-2 text-muted-foreground hover:text-primary py-2"
+                        className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
                       >
                         <LayoutDashboard className="h-4 w-4" />
                         Admin Dashboard
                       </Link>
-                    )}
-                    <button
-                      onClick={() => {
-                        setIsOpen(false);
-                        handleLogout();
-                      }}
-                      className="flex items-center gap-2 text-destructive py-2 w-full"
-                    >
-                      <LogOut className="h-4 w-4" />
-                      Logout
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-2">
-                    <Button variant="outline" asChild className="w-full">
-                      <Link href="/login" onClick={() => setIsOpen(false)}>
-                        <User className="mr-2 h-4 w-4" />
-                        Login
-                      </Link>
-                    </Button>
-                    <Button asChild className="w-full">
-                      <Link href="/register" onClick={() => setIsOpen(false)}>
-                        Register
-                      </Link>
-                    </Button>
-                  </div>
-                )}
-              </div>
+                    </>
+                  )}
+                  <div className="border-t my-2" />
+                  <button
+                    onClick={() => {
+                      setIsOpen(false);
+                      handleLogout();
+                    }}
+                    className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-destructive hover:bg-destructive/10 transition-colors w-full"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2 mt-2">
+                  <Button variant="outline" asChild className="w-full">
+                    <Link href="/login" onClick={() => setIsOpen(false)}>
+                      <User className="mr-2 h-4 w-4" />
+                      Login
+                    </Link>
+                  </Button>
+                  <Button asChild className="w-full">
+                    <Link href="/register" onClick={() => setIsOpen(false)}>
+                      Register
+                    </Link>
+                  </Button>
+                </div>
+              )}
             </nav>
           </SheetContent>
         </Sheet>

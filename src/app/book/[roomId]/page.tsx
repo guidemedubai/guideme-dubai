@@ -18,8 +18,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Dialog,
+  DialogContent,
+} from "@/components/ui/dialog";
 import { Loader2, Users, MapPin, AlertCircle, CheckCircle, CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, useIsMobile } from "@/lib/utils";
 import { toast } from "sonner";
 
 interface Room {
@@ -56,6 +60,7 @@ export default function BookingPage({
 
   const [checkIn, setCheckIn] = useState<Date | undefined>();
   const [checkOut, setCheckOut] = useState<Date | undefined>();
+  const isMobile = useIsMobile();
   const [checkInOpen, setCheckInOpen] = useState(false);
   const [checkOutOpen, setCheckOutOpen] = useState(false);
   const [guestName, setGuestName] = useState("");
@@ -203,76 +208,152 @@ export default function BookingPage({
                 <CardTitle>Select Dates</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <Label>Check-in</Label>
-                    <Popover open={checkInOpen} onOpenChange={setCheckInOpen}>
-                      <PopoverTrigger asChild>
+                    {isMobile ? (
+                      <>
                         <Button
+                          type="button"
                           variant="outline"
                           className={cn(
                             "w-full justify-start text-left font-normal mt-2",
                             !checkIn && "text-muted-foreground"
                           )}
+                          onClick={() => setCheckInOpen(true)}
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
                           {checkIn ? format(checkIn, "MMM dd, yyyy") : "Select date"}
                         </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={checkIn}
-                          onSelect={(date) => {
-                            setCheckIn(date);
-                            if (date && checkOut && date >= checkOut) {
-                              setCheckOut(undefined);
-                            }
-                            setCheckInOpen(false);
-                          }}
-                          disabled={(date) => {
-                            const today = new Date();
-                            today.setHours(0, 0, 0, 0);
-                            return date < today;
-                          }}
-                        />
-                      </PopoverContent>
-                    </Popover>
+                        <Dialog open={checkInOpen} onOpenChange={setCheckInOpen}>
+                          <DialogContent className="p-0 w-auto max-w-[calc(100vw-2rem)]" showCloseButton={false}>
+                            <Calendar
+                              mode="single"
+                              selected={checkIn}
+                              onSelect={(date) => {
+                                setCheckIn(date);
+                                if (date && checkOut && date >= checkOut) {
+                                  setCheckOut(undefined);
+                                }
+                                setCheckInOpen(false);
+                              }}
+                              disabled={(date) => {
+                                const today = new Date();
+                                today.setHours(0, 0, 0, 0);
+                                return date < today;
+                              }}
+                            />
+                          </DialogContent>
+                        </Dialog>
+                      </>
+                    ) : (
+                      <Popover open={checkInOpen} onOpenChange={setCheckInOpen}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal mt-2",
+                              !checkIn && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {checkIn ? format(checkIn, "MMM dd, yyyy") : "Select date"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={checkIn}
+                            onSelect={(date) => {
+                              setCheckIn(date);
+                              if (date && checkOut && date >= checkOut) {
+                                setCheckOut(undefined);
+                              }
+                              setCheckInOpen(false);
+                            }}
+                            disabled={(date) => {
+                              const today = new Date();
+                              today.setHours(0, 0, 0, 0);
+                              return date < today;
+                            }}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    )}
                   </div>
                   <div>
                     <Label>Check-out</Label>
-                    <Popover open={checkOutOpen} onOpenChange={setCheckOutOpen}>
-                      <PopoverTrigger asChild>
+                    {isMobile ? (
+                      <>
                         <Button
+                          type="button"
                           variant="outline"
                           className={cn(
                             "w-full justify-start text-left font-normal mt-2",
                             !checkOut && "text-muted-foreground"
                           )}
+                          onClick={() => setCheckOutOpen(true)}
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
                           {checkOut ? format(checkOut, "MMM dd, yyyy") : "Select date"}
                         </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={checkOut}
-                          onSelect={(date) => {
-                            setCheckOut(date);
-                            setCheckOutOpen(false);
-                          }}
-                          disabled={(date) => {
-                            if (!checkIn) {
-                              const today = new Date();
-                              today.setHours(0, 0, 0, 0);
-                              return date <= today;
-                            }
-                            return date <= checkIn;
-                          }}
-                        />
-                      </PopoverContent>
-                    </Popover>
+                        <Dialog open={checkOutOpen} onOpenChange={setCheckOutOpen}>
+                          <DialogContent className="p-0 w-auto max-w-[calc(100vw-2rem)]" showCloseButton={false}>
+                            <Calendar
+                              mode="single"
+                              selected={checkOut}
+                              onSelect={(date) => {
+                                setCheckOut(date);
+                                setCheckOutOpen(false);
+                              }}
+                              disabled={(date) => {
+                                if (!checkIn) {
+                                  const today = new Date();
+                                  today.setHours(0, 0, 0, 0);
+                                  return date <= today;
+                                }
+                                return date <= checkIn;
+                              }}
+                            />
+                          </DialogContent>
+                        </Dialog>
+                      </>
+                    ) : (
+                      <Popover open={checkOutOpen} onOpenChange={setCheckOutOpen}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal mt-2",
+                              !checkOut && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {checkOut ? format(checkOut, "MMM dd, yyyy") : "Select date"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={checkOut}
+                            onSelect={(date) => {
+                              setCheckOut(date);
+                              setCheckOutOpen(false);
+                            }}
+                            disabled={(date) => {
+                              if (!checkIn) {
+                                const today = new Date();
+                                today.setHours(0, 0, 0, 0);
+                                return date <= today;
+                              }
+                              return date <= checkIn;
+                            }}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    )}
                   </div>
                 </div>
 
