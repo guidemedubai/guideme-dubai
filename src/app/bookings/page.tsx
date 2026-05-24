@@ -223,7 +223,7 @@ export default function BookingsPage() {
 
                       <div className="flex items-center justify-between">
                         <p className="text-lg font-semibold">
-                          AED {booking.totalPrice.toLocaleString()}
+                          USD {booking.totalPrice.toLocaleString()}
                         </p>
 
                         <div className="flex gap-2">

@@ -186,7 +186,7 @@ export default async function PropertyPage({
                           </div>
                           <div className="text-right">
                             <p className="text-2xl font-bold">
-                              AED {room.price}
+                              USD {room.price}
                             </p>
                             <p className="text-sm text-muted-foreground">
                               per night
@@ -270,7 +270,7 @@ export default async function PropertyPage({
                 <div>
                   <p className="text-sm text-muted-foreground">Starting from</p>
                   <p className="text-3xl font-bold">
-                    AED{" "}
+                    USD{" "}
                     {property.rooms.length > 0
                       ? Math.min(...property.rooms.map((r) => r.price))
                       : "N/A"}

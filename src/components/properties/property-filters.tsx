@@ -28,22 +28,22 @@ export interface PropertyFiltersProps {
 }
 
 const AMENITIES_LIST = [
-  { id: "pool", label: "Pool" },
-  { id: "spa", label: "Spa" },
+  { id: "beach", label: "Beach Access" },
+  { id: "diving", label: "Diving Center" },
+  { id: "snorkeling", label: "Snorkeling Gear" },
   { id: "wifi", label: "WiFi" },
   { id: "restaurant", label: "Restaurant" },
-  { id: "gym", label: "Gym" },
-  { id: "beach", label: "Beach" },
-  { id: "parking", label: "Parking" },
+  { id: "spa", label: "Spa" },
+  { id: "water-sports", label: "Water Sports" },
 ];
 
 const CITIES = [
-  "Dubai",
-  "Abu Dhabi",
-  "Sharjah",
-  "Ajman",
-  "Ras Al Khaimah",
-  "Fujairah",
+  "Maafushi",
+  "North Malé Atoll",
+  "Ari Atoll",
+  "Baa Atoll",
+  "Thulusdhoo",
+  "Addu City",
 ];
 
 const GUEST_OPTIONS = ["1", "2", "3", "4", "5", "6", "7", "8", "10+"];
@@ -115,7 +115,7 @@ export function PropertyFilters({
                 <SelectValue placeholder="Select city" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Cities</SelectItem>
+                <SelectItem value="all">All Islands</SelectItem>
                 {CITIES.map((city) => (
                   <SelectItem key={city} value={city}>
                     {city}
@@ -127,7 +127,7 @@ export function PropertyFilters({
 
           {/* Price Range */}
           <div className="space-y-2">
-            <Label>Price Range (AED/night)</Label>
+            <Label>Price Range (USD/night)</Label>
             <div className="flex items-center gap-2">
               <Input
                 type="number"

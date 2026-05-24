@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import {
@@ -12,6 +13,13 @@ import {
   Calendar,
   LayoutDashboard,
   Hotel,
+  Heart,
+  ShoppingCart,
+  Compass,
+  Map,
+  BarChart3,
+  Store,
+  Users,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -34,9 +42,12 @@ import {
 } from "@/components/ui/sheet";
 
 const navigation = [
+  { name: "Explore", href: "/explore" },
   { name: "Properties", href: "/properties" },
-  { name: "About", href: "/about" },
-  { name: "Contact", href: "/contact" },
+  { name: "Activities", href: "/activities" },
+  { name: "Itinerary", href: "/itinerary-planner" },
+  { name: "Map", href: "/map-explore" },
+  { name: "Budget Planner", href: "/budget-planner" },
 ];
 
 export function Header() {
@@ -49,7 +60,7 @@ export function Header() {
     name: string | null;
     email: string;
     image: string | null;
-    role: "GUEST" | "HOST" | "ADMIN";
+    role: string;
   } | undefined;
 
   const isLoading = status === "loading";
@@ -75,8 +86,7 @@ export function Header() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <Hotel className="h-6 w-6 text-primary" />
-          <span className="text-xl font-bold">GuideMe Dubai</span>
+          <Image src="/brand.png" alt="Doletz" width={120} height={36} className="h-8 w-auto" />
         </Link>
 
         {/* Desktop Navigation */}
@@ -135,11 +145,63 @@ export function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
+                  <Link href="/itineraries" className="flex items-center">
+                    <Calendar className="mr-2 h-4 w-4" />
+                    My Itineraries
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/favorites" className="flex items-center">
+                    <Heart className="mr-2 h-4 w-4" />
+                    Favorites
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/cart" className="flex items-center">
+                    <ShoppingCart className="mr-2 h-4 w-4" />
+                    Cart
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/itinerary-planner" className="flex items-center">
+                    <Compass className="mr-2 h-4 w-4" />
+                    My Itineraries
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link href="/profile" className="flex items-center">
                     <Settings className="mr-2 h-4 w-4" />
                     Profile
                   </Link>
                 </DropdownMenuItem>
+                {(user.role === "seller" || user.role === "owner") && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/seller/dashboard" className="flex items-center">
+                        <Store className="mr-2 h-4 w-4" />
+                        Seller Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/seller/analytics" className="flex items-center">
+                        <BarChart3 className="mr-2 h-4 w-4" />
+                        Analytics
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
+                {user.role === "agent" && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/agent/dashboard" className="flex items-center">
+                        <Users className="mr-2 h-4 w-4" />
+                        Agent Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
                 {user.role === "ADMIN" && (
                   <>
                     <DropdownMenuSeparator />
@@ -189,8 +251,7 @@ export function Header() {
                   className="flex items-center gap-2"
                   onClick={() => setIsOpen(false)}
                 >
-                  <Hotel className="h-6 w-6 text-primary" />
-                  <span className="text-xl font-bold">GuideMe Dubai</span>
+                  <Image src="/brand.png" alt="Doletz" width={120} height={36} className="h-8 w-auto" />
                 </Link>
               </SheetTitle>
             </SheetHeader>
@@ -242,6 +303,30 @@ export function Header() {
                       My Bookings
                     </Link>
                     <Link
+                      href="/favorites"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center gap-2 text-muted-foreground hover:text-primary py-2"
+                    >
+                      <Heart className="h-4 w-4" />
+                      Favorites
+                    </Link>
+                    <Link
+                      href="/cart"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center gap-2 text-muted-foreground hover:text-primary py-2"
+                    >
+                      <ShoppingCart className="h-4 w-4" />
+                      Cart
+                    </Link>
+                    <Link
+                      href="/itinerary-planner"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center gap-2 text-muted-foreground hover:text-primary py-2"
+                    >
+                      <Compass className="h-4 w-4" />
+                      My Itineraries
+                    </Link>
+                    <Link
                       href="/profile"
                       onClick={() => setIsOpen(false)}
                       className="flex items-center gap-2 text-muted-foreground hover:text-primary py-2"
@@ -249,6 +334,36 @@ export function Header() {
                       <Settings className="h-4 w-4" />
                       Profile
                     </Link>
+                    {(user.role === "seller" || user.role === "owner") && (
+                      <>
+                        <Link
+                          href="/seller/dashboard"
+                          onClick={() => setIsOpen(false)}
+                          className="flex items-center gap-2 text-muted-foreground hover:text-primary py-2"
+                        >
+                          <Store className="h-4 w-4" />
+                          Seller Dashboard
+                        </Link>
+                        <Link
+                          href="/seller/analytics"
+                          onClick={() => setIsOpen(false)}
+                          className="flex items-center gap-2 text-muted-foreground hover:text-primary py-2"
+                        >
+                          <BarChart3 className="h-4 w-4" />
+                          Analytics
+                        </Link>
+                      </>
+                    )}
+                    {user.role === "agent" && (
+                      <Link
+                        href="/agent/dashboard"
+                        onClick={() => setIsOpen(false)}
+                        className="flex items-center gap-2 text-muted-foreground hover:text-primary py-2"
+                      >
+                        <Users className="h-4 w-4" />
+                        Agent Dashboard
+                      </Link>
+                    )}
                     {user.role === "ADMIN" && (
                       <Link
                         href="/admin"

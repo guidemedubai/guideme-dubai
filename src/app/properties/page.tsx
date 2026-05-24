@@ -94,9 +94,9 @@ export default function PropertiesPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Find Your Perfect Stay</h1>
+        <h1 className="text-3xl font-bold mb-2">Find Your Island Stay</h1>
         <p className="text-muted-foreground">
-          Discover amazing hotels and resorts in Dubai
+          Discover guesthouses and resorts across the Maldives
         </p>
       </div>
 

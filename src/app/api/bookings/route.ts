@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
-// GET: Fetch user's bookings
+// GET: Fetch bookings (user's own, or all if admin passes ?all=true)
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -15,11 +15,14 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const { searchParams } = new URL(request.url);
+    const all = searchParams.get("all") === "true";
+    const isAdmin = session.user.role === "admin";
+
     const bookings = await prisma.booking.findMany({
-      where: {
-        userId: session.user.id,
-      },
+      where: all && isAdmin ? {} : { userId: session.user.id },
       include: {
+        user: { select: { name: true, email: true } },
         room: {
           include: {
             property: true,
@@ -54,10 +57,10 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { roomId, checkIn, checkOut, guests, specialRequests } = body;
+    const { roomId, checkIn, checkOut, guests, adults, children, infants, guestName, guestPhone, specialRequests } = body;
 
     // Validate required fields
-    if (!roomId || !checkIn || !checkOut || !guests) {
+    if (!roomId || !checkIn || !checkOut || !guests || !guestName || !guestPhone) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -154,9 +157,14 @@ export async function POST(request: NextRequest) {
     // Create booking
     const booking = await prisma.booking.create({
       data: {
+        guestName,
+        guestPhone,
         checkIn: checkInDate,
         checkOut: checkOutDate,
         guests,
+        adults: adults || 1,
+        children: children || 0,
+        infants: infants || 0,
         totalPrice,
         status: 'pending',
         paymentStatus: 'pending',

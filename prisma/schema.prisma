@@ -13,14 +13,22 @@ model User {
   email         String    @unique
   password      String
   name          String
-  role          String    @default("user") // user, admin, owner
+  phone         String?
+  role          String    @default("user") // user, admin, owner, agent, seller
   image         String?
+  bio           String?
+  company       String?
+  licenseNumber String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
   properties    Property[]
   bookings      Booking[]
   reviews       Review[]
+  favorites     Favorite[]
+  cartItems     CartItem[]
+  itineraries   Itinerary[]
+  activities    Activity[]  @relation("ActivityOwner")
 }
 
 model Property {
@@ -43,8 +51,10 @@ model Property {
   ownerId     String
   owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
-  rooms       Room[]
-  reviews     Review[]
+  rooms          Room[]
+  reviews        Review[]
+  favorites      Favorite[]
+  itineraryItems ItineraryItem[]
 }
 
 model Room {
@@ -64,13 +74,19 @@ model Room {
   property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
   bookings    Booking[]
+  cartItems   CartItem[]
 }
 
 model Booking {
   id            String   @id @default(cuid())
+  guestName     String?
+  guestPhone    String?
   checkIn       DateTime
   checkOut      DateTime
   guests        Int
+  adults        Int      @default(1)
+  children      Int      @default(0)
+  infants       Int      @default(0)
   totalPrice    Float
   status        String   @default("pending") // pending, confirmed, cancelled, completed
   paymentStatus String   @default("pending") // pending, paid, refunded
@@ -101,4 +117,105 @@ model Review {
   property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
   @@unique([userId, propertyId])
+}
+
+model Activity {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  category    String   // adventure, cultural, dining, nightlife, shopping, wellness, water-sports, desert
+  address     String
+  city        String
+  country     String   @default("UAE")
+  latitude    Float?
+  longitude   Float?
+  images      String   // JSON array
+  duration    String   // e.g. "2 hours", "Half day"
+  price       Float
+  rating      Float    @default(0)
+  reviewCount Int      @default(0)
+  featured    Boolean  @default(false)
+  available   Boolean  @default(true)
+  tags        String?  // JSON array
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  ownerId     String
+  owner       User     @relation("ActivityOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  favorites       Favorite[]
+  cartItems       CartItem[]
+  itineraryItems  ItineraryItem[]
+}
+
+model Favorite {
+  id         String   @id @default(cuid())
+  type       String   // property, activity
+  createdAt  DateTime @default(now())
+
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  propertyId String?
+  property   Property? @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  activityId String?
+  activity   Activity? @relation(fields: [activityId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, propertyId])
+  @@unique([userId, activityId])
+}
+
+model CartItem {
+  id         String   @id @default(cuid())
+  type       String   // room, activity
+  quantity   Int      @default(1)
+  checkIn    DateTime?
+  checkOut   DateTime?
+  guests     Int?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  roomId     String?
+  room       Room?    @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  activityId String?
+  activity   Activity? @relation(fields: [activityId], references: [id], onDelete: Cascade)
+}
+
+model Itinerary {
+  id          String   @id @default(cuid())
+  name        String
+  startDate   DateTime
+  endDate     DateTime
+  budget      Float?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  items       ItineraryItem[]
+}
+
+model ItineraryItem {
+  id          String   @id @default(cuid())
+  day         Int
+  timeSlot    String?  // morning, afternoon, evening
+  notes       String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  itineraryId String
+  itinerary   Itinerary @relation(fields: [itineraryId], references: [id], onDelete: Cascade)
+
+  activityId  String?
+  activity    Activity? @relation(fields: [activityId], references: [id], onDelete: Cascade)
+
+  propertyId  String?
+  property    Property? @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 }

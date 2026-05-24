@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Authentication - GuideMe Dubai",
+  title: "Authentication - Doletz",
   description: "Sign in or create an account",
 };
 

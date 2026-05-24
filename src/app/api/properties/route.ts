@@ -11,12 +11,17 @@ export async function GET(request: NextRequest) {
     const maxPrice = searchParams.get("maxPrice");
     const guests = searchParams.get("guests");
     const amenities = searchParams.get("amenities");
+    const featured = searchParams.get("featured");
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "12");
     const skip = (page - 1) * limit;
 
     // Build property where clause
     const propertyWhere: Record<string, unknown> = {};
+
+    if (featured === "true") {
+      propertyWhere.featured = true;
+    }
 
     if (city) {
       propertyWhere.city = {

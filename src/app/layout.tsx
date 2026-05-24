@@ -21,18 +21,22 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "GuideMe Dubai - Premium Hotel Booking",
-    template: "%s | GuideMe Dubai",
+    default: "Doletz - AI Your Journey | Maldives Travel",
+    template: "%s | Doletz",
   },
   description:
-    "Discover the finest hotels and accommodations in Dubai. Your gateway to luxurious stays and unforgettable experiences in the heart of the UAE.",
+    "Discover paradise in the Maldives. Book guesthouses, resorts, and island activities. AI-powered travel planning for local island experiences.",
   keywords: [
-    "Dubai hotels",
-    "hotel booking",
-    "luxury accommodation",
-    "UAE travel",
-    "Dubai vacation",
+    "Maldives travel",
+    "Maldives guesthouse",
+    "island booking",
+    "Maldives activities",
+    "local island tourism",
   ],
+  icons: {
+    icon: "/icon.png",
+    apple: "/icon.png",
+  },
 };
 
 export default function RootLayout({
@@ -48,8 +52,8 @@ export default function RootLayout({
         <AuthProvider>
           <ThemeProvider
             attribute="class"
-            defaultTheme="system"
-            enableSystem
+            defaultTheme="light"
+            enableSystem={false}
             disableTransitionOnChange
           >
             <div className="relative flex min-h-screen flex-col">

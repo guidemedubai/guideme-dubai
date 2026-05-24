@@ -119,7 +119,7 @@ export function PropertyCard({ property, className }: PropertyCardProps) {
                 <>
                   <p className="text-sm text-muted-foreground">From</p>
                   <p className="text-lg font-bold text-primary">
-                    AED {property.minPrice.toLocaleString()}
+                    USD {property.minPrice.toLocaleString()}
                     <span className="text-sm font-normal text-muted-foreground">
                       /night
                     </span>

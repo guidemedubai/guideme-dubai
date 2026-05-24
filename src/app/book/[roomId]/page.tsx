@@ -6,15 +6,20 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { format, differenceInDays } from "date-fns";
-import { DateRange } from "react-day-picker";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { DateRangePicker } from "@/components/booking/date-range-picker";
-import { Loader2, Users, MapPin, AlertCircle, CheckCircle } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Loader2, Users, MapPin, AlertCircle, CheckCircle, CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 interface Room {
@@ -49,8 +54,15 @@ export default function BookingPage({
   const [isCheckingAvailability, setIsCheckingAvailability] = useState(false);
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
 
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
-  const [guests, setGuests] = useState(1);
+  const [checkIn, setCheckIn] = useState<Date | undefined>();
+  const [checkOut, setCheckOut] = useState<Date | undefined>();
+  const [checkInOpen, setCheckInOpen] = useState(false);
+  const [checkOutOpen, setCheckOutOpen] = useState(false);
+  const [guestName, setGuestName] = useState("");
+  const [guestPhone, setGuestPhone] = useState("");
+  const [adults, setAdults] = useState(1);
+  const [children, setChildren] = useState(0);
+  const [infants, setInfants] = useState(0);
   const [specialRequests, setSpecialRequests] = useState("");
 
   useEffect(() => {
@@ -77,7 +89,7 @@ export default function BookingPage({
 
   useEffect(() => {
     async function checkAvailability() {
-      if (!dateRange?.from || !dateRange?.to) {
+      if (!checkIn || !checkOut) {
         setIsAvailable(null);
         return;
       }
@@ -89,8 +101,8 @@ export default function BookingPage({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             roomId,
-            checkIn: dateRange.from.toISOString(),
-            checkOut: dateRange.to.toISOString(),
+            checkIn: checkIn.toISOString(),
+            checkOut: checkOut.toISOString(),
           }),
         });
         const data = await response.json();
@@ -102,18 +114,18 @@ export default function BookingPage({
       }
     }
     checkAvailability();
-  }, [dateRange, roomId]);
+  }, [checkIn, checkOut, roomId]);
 
   const nights =
-    dateRange?.from && dateRange?.to
-      ? differenceInDays(dateRange.to, dateRange.from)
+    checkIn && checkOut
+      ? differenceInDays(checkOut, checkIn)
       : 0;
   const totalPrice = room ? nights * room.price : 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!dateRange?.from || !dateRange?.to) {
+    if (!checkIn || !checkOut) {
       toast.error("Please select check-in and check-out dates");
       return;
     }
@@ -130,9 +142,14 @@ export default function BookingPage({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           roomId,
-          checkIn: dateRange.from.toISOString(),
-          checkOut: dateRange.to.toISOString(),
-          guests,
+          checkIn: checkIn.toISOString(),
+          checkOut: checkOut.toISOString(),
+          guests: adults + children + infants,
+          adults,
+          children,
+          infants,
+          guestName,
+          guestPhone,
           specialRequests,
         }),
       });
@@ -186,14 +203,84 @@ export default function BookingPage({
                 <CardTitle>Select Dates</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <Label>Check-in & Check-out</Label>
-                  <DateRangePicker
-                    value={dateRange}
-                    onChange={setDateRange}
-                    className="mt-2"
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Check-in</Label>
+                    <Popover open={checkInOpen} onOpenChange={setCheckInOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal mt-2",
+                            !checkIn && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {checkIn ? format(checkIn, "MMM dd, yyyy") : "Select date"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={checkIn}
+                          onSelect={(date) => {
+                            setCheckIn(date);
+                            if (date && checkOut && date >= checkOut) {
+                              setCheckOut(undefined);
+                            }
+                            setCheckInOpen(false);
+                          }}
+                          disabled={(date) => {
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            return date < today;
+                          }}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                  <div>
+                    <Label>Check-out</Label>
+                    <Popover open={checkOutOpen} onOpenChange={setCheckOutOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal mt-2",
+                            !checkOut && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {checkOut ? format(checkOut, "MMM dd, yyyy") : "Select date"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={checkOut}
+                          onSelect={(date) => {
+                            setCheckOut(date);
+                            setCheckOutOpen(false);
+                          }}
+                          disabled={(date) => {
+                            if (!checkIn) {
+                              const today = new Date();
+                              today.setHours(0, 0, 0, 0);
+                              return date <= today;
+                            }
+                            return date <= checkIn;
+                          }}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
                 </div>
+
+                {checkIn && checkOut && nights > 0 && (
+                  <p className="text-sm font-medium">
+                    {nights} night{nights !== 1 ? "s" : ""} · {nights + 1} day{nights + 1 !== 1 ? "s" : ""}
+                  </p>
+                )}
 
                 {isCheckingAvailability && (
                   <div className="flex items-center gap-2 text-muted-foreground">
@@ -224,20 +311,75 @@ export default function BookingPage({
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="guests">Number of Guests</Label>
+                  <Label htmlFor="guestName">Full Name *</Label>
                   <Input
-                    id="guests"
-                    type="number"
-                    min={1}
-                    max={room.capacity}
-                    value={guests}
-                    onChange={(e) => setGuests(parseInt(e.target.value) || 1)}
+                    id="guestName"
+                    value={guestName}
+                    onChange={(e) => setGuestName(e.target.value)}
+                    placeholder="Name as on ID/passport"
                     className="mt-2"
+                    required
                   />
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Maximum {room.capacity} guests
-                  </p>
                 </div>
+
+                <div>
+                  <Label htmlFor="guestPhone">Contact Number *</Label>
+                  <Input
+                    id="guestPhone"
+                    type="tel"
+                    value={guestPhone}
+                    onChange={(e) => setGuestPhone(e.target.value)}
+                    placeholder="+960 xxx xxxx"
+                    className="mt-2"
+                    required
+                  />
+                </div>
+
+                <Separator />
+
+                <p className="text-sm font-medium">Number of Guests</p>
+
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="adults">Adults (12+)</Label>
+                    <Input
+                      id="adults"
+                      type="number"
+                      min={1}
+                      max={room.capacity}
+                      value={adults}
+                      onChange={(e) => setAdults(Math.max(1, parseInt(e.target.value) || 1))}
+                      className="mt-2"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="children">Children (2–12)</Label>
+                    <Input
+                      id="children"
+                      type="number"
+                      min={0}
+                      max={room.capacity}
+                      value={children}
+                      onChange={(e) => setChildren(Math.max(0, parseInt(e.target.value) || 0))}
+                      className="mt-2"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="infants">Infants (&lt;2)</Label>
+                    <Input
+                      id="infants"
+                      type="number"
+                      min={0}
+                      max={5}
+                      value={infants}
+                      onChange={(e) => setInfants(Math.max(0, parseInt(e.target.value) || 0))}
+                      className="mt-2"
+                    />
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {adults + children + infants} total · max {room.capacity} guests
+                </p>
 
                 <div>
                   <Label htmlFor="requests">Special Requests (Optional)</Label>
@@ -257,7 +399,7 @@ export default function BookingPage({
               size="lg"
               className="w-full"
               disabled={
-                isSubmitting || !isAvailable || !dateRange?.from || !dateRange?.to
+                isSubmitting || !isAvailable || !checkIn || !checkOut || !guestName.trim() || !guestPhone.trim()
               }
             >
               {isSubmitting ? (
@@ -266,7 +408,7 @@ export default function BookingPage({
                   Processing...
                 </>
               ) : (
-                `Confirm Booking - AED ${totalPrice.toLocaleString()}`
+                `Confirm Booking - USD ${totalPrice.toLocaleString()}`
               )}
             </Button>
           </form>
@@ -305,24 +447,36 @@ export default function BookingPage({
                 <span>Up to {room.capacity} guests</span>
               </div>
 
+              {guestName && (
+                <div className="text-sm">
+                  <p className="font-medium">{guestName}</p>
+                  {guestPhone && <p className="text-muted-foreground">{guestPhone}</p>}
+                  <p className="text-muted-foreground">
+                    {adults} adult{adults !== 1 ? "s" : ""}
+                    {children > 0 && `, ${children} child${children !== 1 ? "ren" : ""}`}
+                    {infants > 0 && `, ${infants} infant${infants !== 1 ? "s" : ""}`}
+                  </p>
+                </div>
+              )}
+
               <Separator />
 
               <div className="space-y-2">
-                {dateRange?.from && dateRange?.to && (
+                {checkIn && checkOut && (
                   <>
                     <div className="flex justify-between text-sm">
                       <span>Check-in</span>
-                      <span>{format(dateRange.from, "MMM dd, yyyy")}</span>
+                      <span>{format(checkIn, "MMM dd, yyyy")}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span>Check-out</span>
-                      <span>{format(dateRange.to, "MMM dd, yyyy")}</span>
+                      <span>{format(checkOut, "MMM dd, yyyy")}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span>
-                        AED {room.price} x {nights} nights
+                        USD {room.price} x {nights} nights
                       </span>
-                      <span>AED {totalPrice.toLocaleString()}</span>
+                      <span>USD {totalPrice.toLocaleString()}</span>
                     </div>
                   </>
                 )}
@@ -332,7 +486,7 @@ export default function BookingPage({
 
               <div className="flex justify-between font-semibold">
                 <span>Total</span>
-                <span>AED {totalPrice.toLocaleString()}</span>
+                <span>USD {totalPrice.toLocaleString()}</span>
               </div>
             </CardContent>
           </Card>

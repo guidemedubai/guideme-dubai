@@ -22,6 +22,20 @@ export default withAuth(
       }
     }
 
+    // Check if user is trying to access seller routes (excluding register)
+    if (pathname.startsWith("/seller") && !pathname.startsWith("/seller/register")) {
+      if (token?.role !== "seller" && token?.role !== "admin") {
+        return NextResponse.redirect(new URL("/", req.url));
+      }
+    }
+
+    // Check if user is trying to access agent routes (excluding register)
+    if (pathname.startsWith("/agent") && !pathname.startsWith("/agent/register")) {
+      if (token?.role !== "agent" && token?.role !== "admin") {
+        return NextResponse.redirect(new URL("/", req.url));
+      }
+    }
+
     return NextResponse.next();
   },
   {
@@ -33,6 +47,8 @@ export default withAuth(
         if (
           pathname.startsWith("/login") ||
           pathname.startsWith("/register") ||
+          pathname.startsWith("/seller/register") ||
+          pathname.startsWith("/agent/register") ||
           pathname.startsWith("/api/auth")
         ) {
           return true;
@@ -43,6 +59,8 @@ export default withAuth(
           pathname.startsWith("/bookings") ||
           pathname.startsWith("/admin") ||
           pathname.startsWith("/owner") ||
+          pathname.startsWith("/seller") ||
+          pathname.startsWith("/agent") ||
           pathname.startsWith("/profile") ||
           pathname.startsWith("/dashboard")
         ) {
