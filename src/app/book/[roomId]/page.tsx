@@ -302,6 +302,7 @@ export default function BookingPage({
                           <DialogContent className="p-0 w-auto max-w-[calc(100vw-2rem)]" showCloseButton={false}>
                             <Calendar
                               mode="single"
+                              defaultMonth={checkIn}
                               selected={checkOut}
                               onSelect={(date) => {
                                 setCheckOut(date);
@@ -337,6 +338,7 @@ export default function BookingPage({
                         <PopoverContent className="w-auto p-0" align="start">
                           <Calendar
                             mode="single"
+                            defaultMonth={checkIn}
                             selected={checkOut}
                             onSelect={(date) => {
                               setCheckOut(date);

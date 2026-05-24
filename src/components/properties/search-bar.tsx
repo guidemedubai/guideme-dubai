@@ -237,6 +237,7 @@ export function SearchBar({
                       <DialogContent className="p-0 w-auto max-w-[calc(100vw-2rem)]" showCloseButton={false}>
                         <Calendar
                           mode="single"
+                          defaultMonth={checkInDate}
                           selected={checkOutDate}
                           onSelect={(date) => {
                             setCheckOutDate(date as Date);
@@ -262,6 +263,7 @@ export function SearchBar({
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
                         mode="single"
+                        defaultMonth={checkInDate}
                         selected={checkOutDate}
                         onSelect={(date) => {
                           setCheckOutDate(date as Date);
