@@ -115,14 +115,14 @@ export function DateRangePicker({
 
   if (isMobile) {
     return (
-      <>
+      <div>
         {trigger}
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogContent className="p-0 w-auto max-w-[calc(100vw-2rem)]" showCloseButton={false}>
             {calendar}
           </DialogContent>
         </Dialog>
-      </>
+      </div>
     );
   }
 
@@ -226,14 +226,14 @@ export function DateRangePickerWithLabels({
 
   if (isMobile) {
     return (
-      <>
+      <div>
         {trigger}
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogContent className="p-0 w-auto max-w-[calc(100vw-2rem)]" showCloseButton={false}>
             {calendar}
           </DialogContent>
         </Dialog>
-      </>
+      </div>
     );
   }
 

@@ -102,14 +102,14 @@ function DatePickerField({
 
   if (isMobile) {
     return (
-      <>
+      <div>
         {trigger}
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogContent className="p-0 w-auto max-w-[calc(100vw-2rem)]" showCloseButton={false}>
             {calendar}
           </DialogContent>
         </Dialog>
-      </>
+      </div>
     );
   }
 
@@ -206,17 +206,15 @@ export function SearchBar({
             render={({ field }) => (
               <FormItem className={cn(isCompact ? "flex-1 min-w-[140px]" : "")}>
                 {!isCompact && <FormLabel>Check-in</FormLabel>}
-                <FormControl>
-                  <DatePickerField
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder="Check-in"
-                    isMobile={isMobile}
-                    disabled={(date) =>
-                      date < new Date(new Date().setHours(0, 0, 0, 0))
-                    }
-                  />
-                </FormControl>
+                <DatePickerField
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="Check-in"
+                  isMobile={isMobile}
+                  disabled={(date) =>
+                    date < new Date(new Date().setHours(0, 0, 0, 0))
+                  }
+                />
                 <FormMessage />
               </FormItem>
             )}
@@ -229,21 +227,19 @@ export function SearchBar({
             render={({ field }) => (
               <FormItem className={cn(isCompact ? "flex-1 min-w-[140px]" : "")}>
                 {!isCompact && <FormLabel>Check-out</FormLabel>}
-                <FormControl>
-                  <DatePickerField
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder="Check-out"
-                    isMobile={isMobile}
-                    disabled={(date) => {
-                      const checkIn = form.getValues("checkIn");
-                      return (
-                        date < new Date(new Date().setHours(0, 0, 0, 0)) ||
-                        (checkIn && date <= checkIn)
-                      );
-                    }}
-                  />
-                </FormControl>
+                <DatePickerField
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="Check-out"
+                  isMobile={isMobile}
+                  disabled={(date) => {
+                    const checkIn = form.getValues("checkIn");
+                    return (
+                      date < new Date(new Date().setHours(0, 0, 0, 0)) ||
+                      (checkIn && date <= checkIn)
+                    );
+                  }}
+                />
                 <FormMessage />
               </FormItem>
             )}

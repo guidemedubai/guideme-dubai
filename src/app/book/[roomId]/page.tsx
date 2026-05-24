@@ -212,7 +212,7 @@ export default function BookingPage({
                   <div>
                     <Label>Check-in</Label>
                     {isMobile ? (
-                      <>
+                      <div>
                         <Button
                           type="button"
                           variant="outline"
@@ -245,7 +245,7 @@ export default function BookingPage({
                             />
                           </DialogContent>
                         </Dialog>
-                      </>
+                      </div>
                     ) : (
                       <Popover open={checkInOpen} onOpenChange={setCheckInOpen}>
                         <PopoverTrigger asChild>
@@ -285,7 +285,7 @@ export default function BookingPage({
                   <div>
                     <Label>Check-out</Label>
                     {isMobile ? (
-                      <>
+                      <div>
                         <Button
                           type="button"
                           variant="outline"
@@ -318,7 +318,7 @@ export default function BookingPage({
                             />
                           </DialogContent>
                         </Dialog>
-                      </>
+                      </div>
                     ) : (
                       <Popover open={checkOutOpen} onOpenChange={setCheckOutOpen}>
                         <PopoverTrigger asChild>

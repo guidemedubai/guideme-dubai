@@ -474,7 +474,7 @@ function ItineraryPlannerContent() {
             <div className="space-y-2">
               <Label>Start Date</Label>
               {isMobile ? (
-                <>
+                <div>
                   <Button
                     type="button"
                     variant="outline"
@@ -505,7 +505,7 @@ function ItineraryPlannerContent() {
                       />
                     </DialogContent>
                   </Dialog>
-                </>
+                </div>
               ) : (
                 <Popover open={startPopoverOpen} onOpenChange={setStartPopoverOpen}>
                   <PopoverTrigger asChild>
@@ -545,7 +545,7 @@ function ItineraryPlannerContent() {
             <div className="space-y-2">
               <Label>End Date</Label>
               {isMobile ? (
-                <>
+                <div>
                   <Button
                     type="button"
                     variant="outline"
@@ -580,7 +580,7 @@ function ItineraryPlannerContent() {
                       />
                     </DialogContent>
                   </Dialog>
-                </>
+                </div>
               ) : (
                 <Popover open={endPopoverOpen} onOpenChange={setEndPopoverOpen}>
                   <PopoverTrigger asChild>
