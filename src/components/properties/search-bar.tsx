@@ -77,8 +77,8 @@ export function SearchBar({
     },
   });
 
-  const checkInValue = form.watch("checkIn");
-  const checkOutValue = form.watch("checkOut");
+  const [checkInDate, setCheckInDate] = React.useState<Date | undefined>(defaultValues?.checkIn);
+  const [checkOutDate, setCheckOutDate] = React.useState<Date | undefined>(defaultValues?.checkOut);
 
   const [checkInOpen, setCheckInOpen] = React.useState(false);
   const [checkOutOpen, setCheckOutOpen] = React.useState(false);
@@ -105,12 +105,12 @@ export function SearchBar({
       variant="outline"
       className={cn(
         "w-full justify-start text-left font-normal h-10",
-        !checkInValue && "text-muted-foreground"
+        !checkInDate && "text-muted-foreground"
       )}
       onClick={() => setCheckInOpen(true)}
     >
       <CalendarIcon className="mr-2 h-4 w-4" />
-      {checkInValue ? format(checkInValue, "MMM dd, yyyy") : "Check-in"}
+      {checkInDate ? format(checkInDate, "MMM dd, yyyy") : "Check-in"}
     </Button>
   );
 
@@ -120,12 +120,12 @@ export function SearchBar({
       variant="outline"
       className={cn(
         "w-full justify-start text-left font-normal h-10",
-        !checkOutValue && "text-muted-foreground"
+        !checkOutDate && "text-muted-foreground"
       )}
       onClick={() => setCheckOutOpen(true)}
     >
       <CalendarIcon className="mr-2 h-4 w-4" />
-      {checkOutValue ? format(checkOutValue, "MMM dd, yyyy") : "Check-out"}
+      {checkOutDate ? format(checkOutDate, "MMM dd, yyyy") : "Check-out"}
     </Button>
   );
 
@@ -184,8 +184,9 @@ export function SearchBar({
                       <DialogContent className="p-0 w-auto max-w-[calc(100vw-2rem)]" showCloseButton={false}>
                         <Calendar
                           mode="single"
-                          selected={checkInValue}
+                          selected={checkInDate}
                           onSelect={(date) => {
+                            setCheckInDate(date as Date);
                             form.setValue("checkIn", date as Date, { shouldValidate: true });
                             setCheckInOpen(false);
                           }}
@@ -204,8 +205,9 @@ export function SearchBar({
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
                         mode="single"
-                        selected={checkInValue}
+                        selected={checkInDate}
                         onSelect={(date) => {
+                          setCheckInDate(date as Date);
                           form.setValue("checkIn", date as Date, { shouldValidate: true });
                           setCheckInOpen(false);
                         }}
@@ -235,8 +237,9 @@ export function SearchBar({
                       <DialogContent className="p-0 w-auto max-w-[calc(100vw-2rem)]" showCloseButton={false}>
                         <Calendar
                           mode="single"
-                          selected={checkOutValue}
+                          selected={checkOutDate}
                           onSelect={(date) => {
+                            setCheckOutDate(date as Date);
                             form.setValue("checkOut", date as Date, { shouldValidate: true });
                             setCheckOutOpen(false);
                           }}
@@ -259,8 +262,9 @@ export function SearchBar({
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
                         mode="single"
-                        selected={checkOutValue}
+                        selected={checkOutDate}
                         onSelect={(date) => {
+                          setCheckOutDate(date as Date);
                           form.setValue("checkOut", date as Date, { shouldValidate: true });
                           setCheckOutOpen(false);
                         }}
