@@ -9,7 +9,7 @@ admin@doletz.com / admin123
 - Agent Dashboard: http://localhost:3000/agent/dashboard
 - Bookings: http://localhost:3000/bookings
 
-Login with different accounts to access each:
+Login with different accounts to access each: accounts
 
 ┌────────┬───────────────────┬───────────┬───────────────────┐
 │  Role  │       Email       │ Password  │     Dashboard     │

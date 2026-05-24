@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { addDays, differenceInDays, format } from "date-fns";
@@ -95,6 +95,14 @@ function nextClientId() {
 // ── Component ───────────────────────────────────────────────────────────────
 
 export default function ItineraryPlannerPage() {
+  return (
+    <Suspense fallback={<div className="container mx-auto px-4 py-8 max-w-5xl"><Loader2 className="h-8 w-8 animate-spin mx-auto mt-16 text-muted-foreground" /></div>}>
+      <ItineraryPlannerContent />
+    </Suspense>
+  );
+}
+
+function ItineraryPlannerContent() {
   const { data: session, status: authStatus } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
